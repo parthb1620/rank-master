@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Algorithm & Organic Ranking Guide</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome (for icons, mapped to Unicode/Webfonts) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amazon: {
+                            dark: '#232f3e',
+                            light: '#37475a',
+                            orange: '#ff9900',
+                            blue: '#007185',
+                            bg: '#f3f3f3'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            /* Stone-50 equivalent */
+            color: #1f2937;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            max-height: 400px;
+            margin: 0 auto;
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Flywheel Animation */
+        .flywheel-arrow {
+            animation: pulse-arrow 2s infinite;
+        }
+
+        @keyframes pulse-arrow {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutral Commerce (Slate/Stone backgrounds with Amazon-inspired Orange/Blue accents) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Hook and context.
+         2. The A10 Algorithm Decoder: Interactive Doughnut chart breakdown of ranking factors. Explains "How it works".
+         3. The Ranking Simulator: Interactive tool to demonstrate "How to prioritize". Users adjust inputs (Price, Reviews, CVR) to see impact on ranking probability.
+         4. Organic Strategy Blueprint: Accordion/List view for "Ranking without Ads". Focuses on external traffic and content.
+         5. Prioritization Matrix: A sortable list of tasks categorized by Impact vs. Effort.
+    -->
+    <!-- Visualization & Content Choices:
+         - Algorithm Weights -> Doughnut Chart -> Visualizes proportionality of influence (Velocity vs. Text).
+         - Ranking Score -> Gauge/Semi-circle Chart -> Provides immediate visual feedback to user inputs in the simulator.
+         - Process Flows -> CSS Cards/Grid -> Used for the Organic Strategy steps to avoid SVG complexity.
+         - Prioritization -> Interactive HTML Table -> Allows sorting and filtering text-heavy data.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+
+<body class="font-sans antialiased text-slate-800">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-amazon-dark">Rank<span
+                            class="text-amazon-orange">Master</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('algorithm')"
+                        class="text-slate-600 hover:text-amazon-blue px-3 py-2 rounded-md text-sm font-medium transition-colors">The
+                        Algorithm</button>
+                    <button onclick="scrollToSection('simulator')"
+                        class="text-slate-600 hover:text-amazon-blue px-3 py-2 rounded-md text-sm font-medium transition-colors">Simulator</button>
+                    <button onclick="scrollToSection('organic')"
+                        class="text-slate-600 hover:text-amazon-blue px-3 py-2 rounded-md text-sm font-medium transition-colors">Organic
+                        Ranking</button>
+                    <button onclick="scrollToSection('priorities')"
+                        class="text-slate-600 hover:text-amazon-blue px-3 py-2 rounded-md text-sm font-medium transition-colors">Priority
+                        Matrix</button>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button onclick="toggleMobileMenu()"
+                        class="text-slate-600 hover:text-slate-900 focus:outline-none p-2">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="scrollToSection('algorithm'); toggleMobileMenu()"
+                    class="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">The
+                    Algorithm</button>
+                <button onclick="scrollToSection('simulator'); toggleMobileMenu()"
+                    class="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Simulator</button>
+                <button onclick="scrollToSection('organic'); toggleMobileMenu()"
+                    class="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Organic
+                    Ranking</button>
+                <button onclick="scrollToSection('priorities'); toggleMobileMenu()"
+                    class="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50">Priority
+                    Matrix</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-white">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                Mastering the <span class="text-amazon-blue">A10 Algorithm</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-500">
+                Decode the logic behind Amazon's search results. Learn how to prioritize your efforts and rank #1
+                without spending on ads.
+            </p>
+            <div class="mt-8 flex justify-center gap-4">
+                <button onclick="scrollToSection('algorithm')"
+                    class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amazon-orange hover:bg-amber-600 transition-colors shadow-sm">
+                    Start Learning
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <!-- SECTION 1: THE ALGORITHM DECODED -->
+        <section id="algorithm" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">How the Algorithm Works (A10)</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    Amazon's goal is to maximize Revenue Per Customer (RPC). The A10 algorithm is a "relevance and
+                    performance engine."
+                    It doesn't just look for keywords; it predicts which product is most likely to generate a sale
+                    <i>right now</i>.
+                    Interact with the chart below to understand the weighted factors.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Chart Col -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-semibold text-center mb-4 text-slate-700">Ranking Weight Distribution
+                        (Estimated)</h3>
+                    <div class="chart-container">
+                        <canvas id="algoChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-slate-400 mt-4">*Weights are estimates based on aggregate seller
+                        data.</p>
+                </div>
+
+                <!-- Details Col -->
+                <div id="factor-details"
+                    class="bg-slate-50 p-8 rounded-2xl border border-slate-200 min-h-[400px] flex flex-col justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-mouse-pointer text-4xl text-slate-300 mb-4"></i>
+                        <h3 class="text-xl font-bold text-slate-700">Select a factor on the chart</h3>
+                        <p class="text-slate-500 mt-2">Click any slice of the doughnut chart to reveal how that specific
+                            factor influences your ranking and what you can do about it.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: PRIORITIZATION SIMULATOR -->
+        <section id="simulator"
+            class="scroll-mt-24 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8 md:p-12">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900">Listing Health & Rank Simulator</h2>
+                    <p class="mt-4 text-lg text-slate-600">
+                        "How do I prioritize?" simply means fixing the metric that is currently killing your conversion.
+                        Use this simulator to see how improving different metrics drastically changes your probability
+                        of ranking on Page 1.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Controls -->
+                    <div class="lg:col-span-2 space-y-8">
+
+                        <!-- Control Group 1: Basics -->
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-tag text-amazon-blue"></i> Offer Competitiveness
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="flex justify-between text-sm font-medium text-slate-700 mb-2">
+                                        <span>Price relative to Market Average</span>
+                                        <span id="price-val" class="font-bold text-amazon-blue">Same (100%)</span>
+                                    </label>
+                                    <input type="range" id="price-slider" min="80" max="150" value="100"
+                                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amazon-blue">
+                                    <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                        <span>Cheaper (80%)</span>
+                                        <span>Expensive (150%)</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-slate-700">Prime Eligibility (FBA)</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="prime-toggle" class="sr-only peer" checked>
+                                        <div
+                                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amazon-orange">
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Control Group 2: Content & Social Proof -->
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-star text-amazon-blue"></i> Content & Trust
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="flex justify-between text-sm font-medium text-slate-700 mb-2">
+                                        <span>Listing Optimization Score (Images/Title)</span>
+                                        <span id="opt-val" class="font-bold text-amazon-blue">Good (7/10)</span>
+                                    </label>
+                                    <input type="range" id="opt-slider" min="1" max="10" value="7"
+                                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amazon-blue">
+                                </div>
+                                <div>
+                                    <label class="flex justify-between text-sm font-medium text-slate-700 mb-2">
+                                        <span>Review Rating</span>
+                                        <span id="rating-val" class="font-bold text-amazon-blue">4.0 Stars</span>
+                                    </label>
+                                    <input type="range" id="rating-slider" min="30" max="50" value="40"
+                                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amazon-blue">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Gauge -->
+                    <div
+                        class="flex flex-col items-center justify-center bg-slate-800 text-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-2">Rank Probability</h3>
+                        <p class="text-sm text-slate-400 mb-6 text-center">Likelihood of holding a Page 1 spot for main
+                            keywords.</p>
+
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="gaugeChart"></canvas>
+                        </div>
+
+                        <div id="sim-feedback" class="mt-6 text-center text-sm font-medium text-amazon-orange">
+                            <!-- Dynamic feedback text -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ORGANIC RANKING BLUEPRINT (NO ADS) -->
+        <section id="organic" class="scroll-mt-24">
+            <div class="mb-12 text-center">
+                <h2 class="text-3xl font-bold text-slate-900">How to Rank Without Ads</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    Ranking organically requires proving to Amazon that your product sells itself.
+                    Without PPC (Pay-Per-Click), you must manufacture "Sales Velocity" through other channels.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Strategy Card 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 card-hover">
+                    <div
+                        class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-amazon-blue text-xl">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">1. External Traffic Injection</h3>
+                    <p class="text-slate-600 mb-4 text-sm leading-relaxed">
+                        Amazon A10 loves external traffic 3x more than internal PPC. Drive traffic from TikTok, Blogs,
+                        or Email lists directly to your listing.
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded text-xs font-mono text-slate-700 border border-slate-100">
+                        <span class="font-bold text-amazon-orange">Tip:</span> Use Amazon Attribution tags to measure
+                        this traffic. You get a referral bonus!
+                    </div>
+                </div>
+
+                <!-- Strategy Card 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 card-hover">
+                    <div
+                        class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600 text-xl">
+                        <i class="fas fa-search-dollar"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">2. Long-Tail Keyword Sniper</h3>
+                    <p class="text-slate-600 mb-4 text-sm leading-relaxed">
+                        Don't target "Water Bottle" (Too competitive). Target "pink insulated water bottle for running".
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded text-xs font-mono text-slate-700 border border-slate-100">
+                        <span class="font-bold text-green-600">Action:</span> Put these specific phrases in your Title
+                        and Bullet points. Conversion rates are higher here.
+                    </div>
+                </div>
+
+                <!-- Strategy Card 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 card-hover">
+                    <div
+                        class="h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center mb-4 text-amazon-orange text-xl">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">3. Visual Conversion Rate</h3>
+                    <p class="text-slate-600 mb-4 text-sm leading-relaxed">
+                        If people click but don't buy, your ranking tanks. Your images must answer all customer
+                        questions immediately.
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded text-xs font-mono text-slate-700 border border-slate-100">
+                        <span class="font-bold text-amazon-blue">Check:</span> Is your main image taking up 85% of the
+                        white space?
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Flywheel Visual -->
+            <div class="mt-16 bg-white p-8 rounded-2xl border border-slate-200">
+                <h3 class="text-center font-bold text-xl text-slate-800 mb-8">The Organic Flywheel</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+                    <div class="w-40 p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
+                        <div class="text-2xl mb-2">🛒</div>
+                        <div class="font-bold text-slate-700">Sales History</div>
+                        <div class="text-xs text-slate-500">More sales today =</div>
+                    </div>
+                    <div class="hidden md:block text-slate-300 text-2xl flywheel-arrow"><i
+                            class="fas fa-arrow-right"></i></div>
+                    <div class="block md:hidden text-slate-300 text-2xl py-2"><i class="fas fa-arrow-down"></i></div>
+
+                    <div class="w-40 p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
+                        <div class="text-2xl mb-2">📈</div>
+                        <div class="font-bold text-slate-700">Higher Rank</div>
+                        <div class="text-xs text-slate-500">Better visibility =</div>
+                    </div>
+                    <div class="hidden md:block text-slate-300 text-2xl flywheel-arrow"><i
+                            class="fas fa-arrow-right"></i></div>
+                    <div class="block md:hidden text-slate-300 text-2xl py-2"><i class="fas fa-arrow-down"></i></div>
+
+                    <div class="w-40 p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
+                        <div class="text-2xl mb-2">👀</div>
+                        <div class="font-bold text-slate-700">More Traffic</div>
+                        <div class="text-xs text-slate-500">More eyes =</div>
+                    </div>
+                    <div class="hidden md:block text-slate-300 text-2xl flywheel-arrow"><i
+                            class="fas fa-arrow-right"></i></div>
+                    <div class="block md:hidden text-slate-300 text-2xl py-2"><i class="fas fa-arrow-down"></i></div>
+
+                    <div class="w-40 p-4 bg-amazon-orange text-white rounded-lg shadow-md transform scale-105">
+                        <div class="text-2xl mb-2">💰</div>
+                        <div class="font-bold">More Sales</div>
+                        <div class="text-xs text-white/80">Repeats the cycle</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: PRIORITIZATION MATRIX -->
+        <section id="priorities" class="scroll-mt-24 pb-24">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Task Prioritization Matrix</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Not all optimizations are equal. Focus on <span class="text-green-600 font-bold">High Impact</span>
+                    items first.
+                </p>
+                <div class="mt-6 flex justify-center gap-3">
+                    <button onclick="filterMatrix('all')"
+                        class="px-4 py-1 rounded-full text-sm font-medium bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors matrix-filter active-filter"
+                        data-filter="all">All</button>
+                    <button onclick="filterMatrix('high')"
+                        class="px-4 py-1 rounded-full text-sm font-medium bg-slate-100 hover:bg-green-100 text-green-700 transition-colors matrix-filter"
+                        data-filter="high">High Impact (Quick Wins)</button>
+                    <button onclick="filterMatrix('setup')"
+                        class="px-4 py-1 rounded-full text-sm font-medium bg-slate-100 hover:bg-blue-100 text-blue-700 transition-colors matrix-filter"
+                        data-filter="setup">Foundational</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-slate-200">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Task</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Category</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Impact</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matrix-body" class="bg-white divide-y divide-slate-200">
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-4">RankMaster: Amazon SEO Educational Tool</p>
+            <p class="text-sm">This tool provides simulations based on general knowledge of the A10 algorithm. Actual
+                results may vary.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA & CONTENT ---
+
+        const algoFactors = [
+            {
+                label: 'Sales Velocity (Recent)',
+                value: 35,
+                color: '#ff9900', // Amazon Orange
+                desc: "<strong>The #1 Factor.</strong> Amazon wants to sell what is <em>already selling</em>. If you sell 10 units an hour and your competitor sells 2, you win. This includes sales from all sources."
+            },
+            {
+                label: 'Text Relevance (Keywords)',
+                value: 20,
+                color: '#232f3e', // Amazon Dark
+                desc: "<strong>Keywords are the map.</strong> If your Title doesn't say 'Yoga Mat', Amazon won't show you for 'Yoga Mat'. Front-load main keywords in the Title (first 80 chars)."
+            },
+            {
+                label: 'Conversion Rate (CVR)',
+                value: 20,
+                color: '#007185', // Amazon Blue
+                desc: "<strong>The Quality Score.</strong> CVR = Orders / Visits. A high CVR tells Amazon your product is exactly what customers want. Improve images and price to boost this."
+            },
+            {
+                label: 'Sales History (Authority)',
+                value: 10,
+                color: '#37475a', // Light Dark
+                desc: "<strong>Consistency matters.</strong> A product that has sold well for 6 months beats a product that had one lucky day. Don't go out of stock!"
+            },
+            {
+                label: 'Off-Amazon Traffic',
+                value: 10,
+                color: '#10b981', // Green
+                desc: "<strong>The A10 Booster.</strong> Amazon loves free customers. Traffic sent from Facebook, Email, or TikTok carries extra ranking weight."
+            },
+            {
+                label: 'Customer Satisfaction',
+                value: 5,
+                color: '#ef4444', // Red (for warning)
+                desc: "<strong>The Penalty Box.</strong> High returns, bad reviews, or late shipments will de-rank you instantly, regardless of sales."
+            }
+        ];
+
+        const priorityTasks = [
+            { task: "Main Image Optimization", category: "Conversion", impact: "High", type: "high", desc: "Make image take up 85%+ space. Use pure white background. Add shadows/depth." },
+            { task: "Title Keyword Front-loading", category: "SEO", impact: "High", type: "high", desc: "Put your top 3 keywords in the first 80 characters of the title." },
+            { task: "Price Competitiveness", category: "Offer", impact: "High", type: "high", desc: "Ensure price is within 10-15% of market average for page 1." },
+            { task: "Backend Search Terms", category: "SEO", impact: "Medium", type: "setup", desc: "Fill the 249 bytes in backend keywords. Don't repeat words." },
+            { task: "A+ Content (EBC)", category: "Conversion", impact: "Medium", type: "setup", desc: "Add rich images and brand story below the fold." },
+            { task: "Review Request Automation", category: "Trust", impact: "Medium", type: "setup", desc: "Use the 'Request Review' button on orders to build social proof." },
+            { task: "Alt Text for Images", category: "SEO", impact: "Low", type: "setup", desc: "Add keywords to image metadata for accessibility and SEO." }
+        ];
+
+        // --- CHART INITIALIZATION ---
+
+        let algoChartInstance = null;
+        let gaugeChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initAlgoChart();
+            initGaugeChart();
+            populateMatrix('all'); // Fixed: Function name corrected
+            updateSimulation(); // Run once to set initial state
+        });
+
+        function initAlgoChart() {
+            const ctx = document.getElementById('algoChart').getContext('2d');
+            algoChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: algoFactors.map(f => f.label),
+                    datasets: [{
+                        data: algoFactors.map(f => f.value),
+                        backgroundColor: algoFactors.map(f => f.color),
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return ` ${context.label}: ~${context.raw}% influence`;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (evt, activeElements) => {
+                        if (activeElements.length > 0) {
+                            const index = activeElements[0].index;
+                            updateFactorDetails(index);
+                        }
+                    }
+                }
+            });
+        }
+
+        function initGaugeChart() {
+            const ctx = document.getElementById('gaugeChart').getContext('2d');
+            gaugeChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Success Probability', 'Gap'],
+                    datasets: [{
+                        data: [50, 50],
+                        backgroundColor: ['#ff9900', '#37475a'],
+                        borderWidth: 0,
+                        circumference: 180,
+                        rotation: 270,
+                        cutout: '80%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+
+        // --- INTERACTION LOGIC ---
+
+        function updateFactorDetails(index) {
+            const factor = algoFactors[index];
+            const container = document.getElementById('factor-details');
+
+            // Animate transition
+            container.style.opacity = '0';
+
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="text-left">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-4 h-12 rounded-full" style="background-color: ${factor.color}"></div>
+                            <h3 class="text-2xl font-bold text-slate-800">${factor.label}</h3>
+                            <span class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm font-bold">~${factor.value}% Weight</span>
+                        </div>
+                        <div class="text-slate-600 text-lg leading-relaxed space-y-4">
+                            ${factor.desc}
+                        </div>
+                    </div>
+                `;
+                container.style.opacity = '1';
+                container.style.transition = 'opacity 0.3s ease-in';
+            }, 200);
+        }
+
+        // --- SIMULATOR LOGIC ---
+
+        const priceSlider = document.getElementById('price-slider');
+        const primeToggle = document.getElementById('prime-toggle');
+        const optSlider = document.getElementById('opt-slider');
+        const ratingSlider = document.getElementById('rating-slider');
+
+        // Event Listeners
+        [priceSlider, primeToggle, optSlider, ratingSlider].forEach(el => {
+            el.addEventListener('input', updateSimulation);
+        });
+
+        function updateSimulation() {
+            // 1. Get Values
+            const price = parseInt(priceSlider.value); // 80 (cheap) to 150 (expensive)
+            const isPrime = primeToggle.checked;
+            const optimization = parseInt(optSlider.value); // 1 to 10
+            const rating = parseInt(ratingSlider.value); // 30 (3.0) to 50 (5.0)
+
+            // 2. Update Labels
+            document.getElementById('price-val').innerText = price === 100 ? "Same (100%)" : price > 100 ? `${price}% (High)` : `${price}% (Low)`;
+            document.getElementById('price-val').className = price > 110 ? "font-bold text-red-500" : "font-bold text-green-600";
+
+            document.getElementById('opt-val').innerText = `${optimization}/10`;
+            document.getElementById('rating-val').innerText = (rating / 10).toFixed(1) + " Stars";
+
+            // 3. Calculate Score
+            let score = 50; // Base score
+
+            // Price impact: Lower is better (linear approximation)
+            if (price < 100) score += (100 - price) * 0.8;
+            if (price > 100) score -= (price - 100) * 1.2; // Being expensive hurts more
+
+            // Prime Impact
+            if (isPrime) score += 20; else score -= 30;
+
+            // Content Impact
+            score += (optimization - 5) * 4; // +/- 20 points
+
+            // Rating Impact
+            if (rating >= 40) score += (rating - 40) * 1.5;
+            else score -= (40 - rating) * 3; // Low ratings hurt bad
+
+            // Clamp score 0-100
+            score = Math.max(0, Math.min(100, Math.round(score)));
+
+            // 4. Update Gauge
+            if (gaugeChartInstance) {
+                gaugeChartInstance.data.datasets[0].data = [score, 100 - score];
+
+                // Color change based on score
+                let color = '#ef4444'; // Red
+                if (score > 40) color = '#ff9900'; // Orange
+                if (score > 75) color = '#10b981'; // Green
+
+                gaugeChartInstance.data.datasets[0].backgroundColor = [color, '#e2e8f0'];
+                gaugeChartInstance.update();
+            }
+
+            // 5. Update Feedback Text
+            const feedbackEl = document.getElementById('sim-feedback');
+            if (score > 80) feedbackEl.innerHTML = `🌟 <strong>Excellent!</strong> You are primed for Page 1.`;
+            else if (score > 50) feedbackEl.innerHTML = `⚠️ <strong>Competitive.</strong> Good base, but needs velocity or lower price.`;
+            else feedbackEl.innerHTML = `🛑 <strong>Invisible.</strong> Fix Prime status or pricing immediately.`;
+        }
+
+
+        // --- PRIORITIZATION MATRIX LOGIC ---
+
+        function populateMatrix(filter) {
+            const tbody = document.getElementById('matrix-body');
+            tbody.innerHTML = '';
+
+            const filteredTasks = filter === 'all' ? priorityTasks : priorityTasks.filter(t => t.type === filter);
+
+            filteredTasks.forEach(item => {
+                const impactColor = item.impact === 'High' ? 'text-green-600 bg-green-50' : item.impact === 'Medium' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 bg-slate-50';
+
+                const row = `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${item.task}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${item.category}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${impactColor}">
+                                ${item.impact}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-500">${item.desc}</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        function filterMatrix(type) {
+            populateMatrix(type);
+
+            // Update buttons
+            document.querySelectorAll('.matrix-filter').forEach(btn => {
+                if (btn.dataset.filter === type) {
+                    btn.classList.add('bg-slate-200', 'text-slate-800');
+                    btn.classList.remove('bg-slate-100', 'text-slate-500');
+                } else {
+                    btn.classList.remove('bg-slate-200', 'text-slate-800');
+                    btn.classList.remove('active-filter');
+                    // Add hover states logic via CSS classes primarily
+                }
+            });
+        }
+
+        // Initial population call moved to DOMContentLoaded
+
+        // --- NAVIGATION HELPERS ---
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+    </script>
+</body>
+
+</html>
